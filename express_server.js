@@ -48,10 +48,14 @@ app.get("/urls/new", (req, res) => {
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
-  // urlDatabase[req.body];
-  // console.log(req.body);
   res.redirect(`/urls/${shortURL}`);
 })
+
+// Redirect to the appropriate long URL
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[req.params.id]
+  res.redirect(longURL);
+});
 
 // Page that displays a single URL and its shortened form
 app.get("/urls/:id", (req, res) => {
@@ -61,7 +65,6 @@ app.get("/urls/:id", (req, res) => {
   }
   res.render("urls_show", templateVars);
 });
-
 
 
 // listen should always be at the end 

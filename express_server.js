@@ -46,8 +46,11 @@ app.get("/urls/new", (req, res) => {
 
 // Handle the form submission
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  res.send("OK");
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = req.body.longURL;
+  // urlDatabase[req.body];
+  // console.log(req.body);
+  res.redirect(`/urls/${shortURL}`);
 })
 
 // Page that displays a single URL and its shortened form

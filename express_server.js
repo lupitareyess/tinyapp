@@ -73,6 +73,17 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls")
 });
 
+// Edit/update a URL
+app.post("/urls/:id", (req, res) => {
+  const id = req.params.id
+  let newURL = req.body.updatedURL;
+  if (!newURL.includes('http')) {
+    newURL = `http://${newURL}`
+  };
+  urlDatabase[id] = newURL;
+  res.redirect("/urls");
+});
+
 // listen should always be at the end 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

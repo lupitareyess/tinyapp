@@ -66,6 +66,12 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+// Delete a URL
+app.post("/urls/:id/delete", (req, res) => {
+  const id = req.params.id;
+  delete urlDatabase[id];
+  res.redirect("/urls")
+});
 
 // listen should always be at the end 
 app.listen(PORT, () => {

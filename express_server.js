@@ -20,7 +20,16 @@ app.get("/urls", (req, res) => {
     urls: urlDatabase
   }
   res.render("urls_index", templateVars);
-})
+});
+
+// Page that displays a single URL and its shortened form
+app.get("/urls/:id", (req, res) => {
+  const templateVars = {
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id]
+  }
+  res.render("urls_show", templateVars);
+});
 
 
 // listen should always be at the end 

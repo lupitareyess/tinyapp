@@ -6,6 +6,11 @@ app.set("view engine", "ejs");
 // parses the body
 app.use(express.urlencoded({ extended: true }));
 
+const urlDatabase = {
+  "b2xVn2": "http://www.lighthouselabs.ca",
+  "9sm5xK": "http://www.google.com"
+};
+
 // Generate unique short URL id whoch returns 6 random alphanumeric characters
 const generateRandomString = () => {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -20,10 +25,6 @@ const generateRandomString = () => {
   return randomString;
 };
 
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
 
 //Change this later, will be for homepage
 app.get("/", (req, res) => {

@@ -3,6 +3,22 @@ const app = express();
 const PORT = 8080;
 
 app.set("view engine", "ejs");
+// parses the body
+app.use(express.urlencoded({ extended: true }));
+
+// Generate unique short URL id whoch returns 6 random alphanumeric characters
+const generateRandomString = () => {
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const length = 6;
+  let randomString = "";
+  let randomNumber;
+
+  for (let i = 0; i < length; i++) {
+    randomNumber = Math.floor(Math.random() * characters.length);
+    randomString += characters[randomNumber];
+  }
+  return randomString;
+};
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -27,9 +43,11 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-
-
 // Handle the form submission
+app.post("/urls", (req, res) => {
+  console.log(req.body);
+  res.send("OK");
+})
 
 // Page that displays a single URL and its shortened form
 app.get("/urls/:id", (req, res) => {

@@ -22,6 +22,15 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+// Render form on web page to present to user 
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
+
+
+// Handle the form submission
+
 // Page that displays a single URL and its shortened form
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
@@ -30,6 +39,7 @@ app.get("/urls/:id", (req, res) => {
   }
   res.render("urls_show", templateVars);
 });
+
 
 
 // listen should always be at the end 

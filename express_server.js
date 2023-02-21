@@ -9,18 +9,18 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+//Change this later, will be for homepage
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-// putting HTML directly in JS code is considered bad practice
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
+// Pass URL data to urls_index template
+app.get("/urls", (req, res) => {
+  const templateVars = {
+    urls: urlDatabase
+  }
+  res.render("urls_index", templateVars);
+})
 
 
 // listen should always be at the end 

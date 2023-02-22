@@ -98,7 +98,13 @@ app.post("/login", (req, res) => {
   console.log(cookie)
   res.cookie("username", cookie);
   res.redirect("/urls");
-})
+});
+
+// Logout endpoint
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
+  res.redirect("/urls"); // need to change this later since not ideal
+});
 
 // listen should always be at the end 
 app.listen(PORT, () => {

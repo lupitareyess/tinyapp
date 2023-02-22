@@ -19,13 +19,23 @@
       </div>
       <% if (!username) { %>
       <form method="post" action="/login" class="form-inline">
-        <input type="text" name="username" placeholder="Username" required />
-        <button type="submit">Login</button>
+        <div>
+          <input
+            class="form-control mr-2"
+            type="text"
+            name="username"
+            placeholder="Username"
+            required
+          />
+          <button type="submit">Login</button>
       </form>
       <% } else { %>
-      <p>You are logged in as: <%= username %></p>
-      <a href="#"><button>Logout</button></a>
+        <form class="form-inline" action="/logout" method="post">
+          <div>
+            Logged in as: <%= username %>
+            <button type="submit">Logout</button>
+          </div>
+        </form>
       <% } %>
-    </div>
   </nav>
 </header>

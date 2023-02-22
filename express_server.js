@@ -106,6 +106,15 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls"); // need to change this later since not ideal
 });
 
+// Registration endpoint
+app.get("/register", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render("urls_register", templateVars);
+});
+
+
 // listen should always be at the end 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

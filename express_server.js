@@ -14,6 +14,20 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// User database
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "hello",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "bye",
+  },
+};
+
 // Generate unique short URL id whoch returns 6 random alphanumeric characters
 const generateRandomString = () => {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -106,12 +120,28 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls"); // need to change this later since not ideal
 });
 
-// Registration endpoint
+// Registration route - render registration template
 app.get("/register", (req, res) => {
   const templateVars = {
     username: req.cookies["username"]
   };
   res.render("urls_register", templateVars);
+});
+
+// Registration endpoint that handles the registration data:
+app.post("/register", (req, res) => {
+  const userID = generateRandomString()
+  const email = req.body.email;
+  const password = req.body.password;
+  users[userID] = {
+    userID,
+    email,
+    password
+  };
+  res.cookie("user_id", userID);
+  console.log(users);
+
+  res.redirect("/urls");
 });
 
 

@@ -1,10 +1,13 @@
 const express = require("express");
 const app = express();
 const PORT = 8080;
+const cookieParser = require('cookie-parser');
 
 app.set("view engine", "ejs");
+
 // parses the body
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -34,14 +37,18 @@ app.get("/", (req, res) => {
 // Pass URL data to urls_index template
 app.get("/urls", (req, res) => {
   const templateVars = {
-    urls: urlDatabase
+    urls: urlDatabase,
+    username: req.cookies["username"]
   }
   res.render("urls_index", templateVars);
 });
 
 // Render form on web page to present to user 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    username: req.cookies["username"]
+  }
+  res.render("urls_new", templateVars);
 });
 
 // Handle the form submission
@@ -61,7 +68,8 @@ app.get("/u/:id", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id]
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies["username"]
   }
   res.render("urls_show", templateVars);
 });

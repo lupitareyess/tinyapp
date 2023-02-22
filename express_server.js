@@ -84,6 +84,14 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
+// Login Route
+app.post("/login", (req, res) => {
+  const cookie = req.body.username
+  console.log(cookie)
+  res.cookie("username", cookie);
+  res.redirect("/urls");
+})
+
 // listen should always be at the end 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

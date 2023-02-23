@@ -42,6 +42,16 @@ const generateRandomString = () => {
   return randomString;
 };
 
+// Function to lookup user
+const getUserByEmail = (email) => {
+  for (const user in users) {
+    if (email === users[user].email) {
+      return users[user];
+    }
+  }
+  return undefined;
+}
+
 
 //Change this later, will be for homepage
 app.get("/", (req, res) => {
@@ -52,7 +62,7 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   }
   res.render("urls_index", templateVars);
 });
@@ -60,7 +70,7 @@ app.get("/urls", (req, res) => {
 // Render form on web page to present to user 
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   }
   res.render("urls_new", templateVars);
 });
@@ -83,7 +93,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   }
   res.render("urls_show", templateVars);
 });
@@ -123,7 +133,7 @@ app.post("/logout", (req, res) => {
 // Registration route - render registration template
 app.get("/register", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_register", templateVars);
 });
@@ -133,16 +143,28 @@ app.post("/register", (req, res) => {
   const userID = generateRandomString()
   const email = req.body.email;
   const password = req.body.password;
-  users[userID] = {
-    userID,
-    email,
-    password
-  };
-  res.cookie("user_id", userID);
-  console.log(users);
-
-  res.redirect("/urls");
+  if (email === "" || password === "") {
+    res.status(404);
+    res.send('400. Request has resulted in an error');
+  }
+  else if (getUserByEmail(email)) {
+    res.status(404);
+    res.send('400. Email associated with existing account')
+  }
+  else {
+    users[userID] = {
+      userID,
+      email,
+      password
+    };
+    console.log(users)
+    res.cookie("user_id", userID);
+    res.redirect("/urls");
+  }
 });
+
+
+
 
 
 // listen should always be at the end 

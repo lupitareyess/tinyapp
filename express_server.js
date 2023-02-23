@@ -116,7 +116,15 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
-// Login Route
+// Login route - render login template
+app.get("/login", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies["user_id"]]
+  }
+  res.render("urls_login", templateVars)
+})
+
+// Login Endpoint
 app.post("/login", (req, res) => {
   const cookie = req.body.username
   console.log(cookie)

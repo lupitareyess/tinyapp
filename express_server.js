@@ -122,7 +122,10 @@ app.get("/login", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]]
   }
-  res.render("urls_login", templateVars)
+  if (templateVars.user) {
+    return res.redirect("/urls")
+  }
+  return res.render("urls_login", templateVars)
 })
 
 // Login Endpoint
@@ -160,7 +163,10 @@ app.get("/register", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]]
   };
-  res.render("urls_register", templateVars);
+  if (templateVars.user) {
+    return res.redirect("/urls");
+  }
+  return res.render("urls_register", templateVars);
 });
 
 // Registration endpoint that handles the registration data:

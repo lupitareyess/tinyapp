@@ -17,12 +17,12 @@ const urlDatabase = {
 // User database
 const users = {
   userRandomID: {
-    id: "userRandomID",
+    userID: "userRandomID",
     email: "user@example.com",
     password: "hello",
   },
   user2RandomID: {
-    id: "user2RandomID",
+    userID: "user2RandomID",
     email: "user2@example.com",
     password: "bye",
   },
@@ -49,7 +49,7 @@ const getUserByEmail = (email) => {
       return users[user];
     }
   }
-  return undefined;
+  return null;
 }
 
 
@@ -60,6 +60,7 @@ app.get("/", (req, res) => {
 
 // Pass URL data to urls_index template
 app.get("/urls", (req, res) => {
+
   const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]]
@@ -126,16 +127,32 @@ app.get("/login", (req, res) => {
 
 // Login Endpoint
 app.post("/login", (req, res) => {
-  const cookie = req.body.username
-  console.log(cookie)
-  res.cookie("username", cookie);
-  res.redirect("/urls");
+  const email = req.body.email;
+  const password = req.body.password;
+
+  if (email === '' || password === '') {
+    return res.status(400).send('400. Email and password is required.');
+  }
+
+  const user = getUserByEmail(email)
+  console.log(user)
+  if (!user) {
+    return res.status(404).send("404. User not found.")
+  }
+
+  if (user.password !== password) {
+    return res.status(403).send("Incorrect password")
+  }
+
+  res.cookie("user_id", user.userID);;
+  return res.redirect("/urls");
+
 });
 
-// Logout endpoint
+// Logout endpoint - clear cookies
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
-  res.redirect("/urls"); // need to change this later since not ideal
+  res.clearCookie("user_id");
+  res.redirect("/login");
 });
 
 // Registration route - render registration template
@@ -152,12 +169,10 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   if (email === "" || password === "") {
-    res.status(404);
-    res.send('400. Request has resulted in an error');
+    return res.status(404).send('400. Request has resulted in an error');
   }
   else if (getUserByEmail(email)) {
-    res.status(404);
-    res.send('400. Email associated with existing account')
+    return res.status(404).send('400. Email associated with existing account')
   }
   else {
     users[userID] = {
@@ -165,9 +180,9 @@ app.post("/register", (req, res) => {
       email,
       password
     };
-    console.log(users)
+
     res.cookie("user_id", userID);
-    res.redirect("/urls");
+    return res.redirect("/urls");
   }
 });
 

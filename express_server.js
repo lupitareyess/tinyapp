@@ -37,13 +37,14 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   const userID = req.session.user_id;
   const user = users[userID];
-
-  if (!user) {
-    return res.send("Please log in or register to access URLs.")
-  }
   const templateVars = {
     urls: urlsForUser(userID, urlDatabase),
-    user: users[userID]
+    user: users[userID],
+    error: "Please log in or register to access TinyApp URLs."
+  };
+
+  if (!user) {
+    return res.status(403).render("errors", templateVars);
   }
 
   return res.render("urls_index", templateVars);
@@ -53,11 +54,11 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const userID = req.session.user_id;
   if (!userID) {
-    return res.redirect("/login")
+    return res.redirect("/login");
   }
   const templateVars = {
     user: users[userID]
-  }
+  };
 
   return res.render("urls_new", templateVars);
 });
@@ -68,26 +69,37 @@ app.get("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const userURLS = urlsForUser(userID, urlDatabase);
 
-  //if user is not logged in
   if (!userID) {
-    return res.status(403).send("Must be logged in or registered to acess URLs")
+    const templateVars = {
+      user: null,
+      error: "Please log in or register to access TinyApp URLs."
+    };
+
+    return res.status(403).render("errors", templateVars);
   }
 
-  //if shortURL does not exist in url databse
   if (!urlDatabase[id]) {
-    return res.status(404).send("URL does no exist")
+    const templateVars = {
+      user: null,
+      error: "Oops! Page does not exist."
+    }
+    return res.status(404).render("errors", templateVars);
   }
 
-  //if url does not belong to user
   if (!userURLS[id]) {
-    return res.status(403).send("You do not have access")
+    const templateVars = {
+      user: null,
+      error: "You do not have access to this URL."
+    }
+    return res.status(403).render("errors", templateVars);
   }
 
   const templateVars = {
     id: id,
     longURL: urlDatabase[id].longURL,
-    user: users[userID]
-  }
+    user: users[userID],
+    error: ''
+  };
 
   res.render("urls_show", templateVars);
 });
@@ -95,16 +107,20 @@ app.get("/urls/:id", (req, res) => {
 // Redirection from shortURL to the appropriate longURL
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id]
+  const longURL = urlDatabase[id];
 
   if (longURL === undefined) {
-    return res.status(400).send("Short URL does not exist")
+    const templateVars = {
+      user: null,
+      error: "Oops! Short URL does not exist."
+    }
+    return res.status(400).render("errors", templateVars);
   }
 
   return res.redirect(urlDatabase[id].longURL);
 });
 
-// Eender registration template 
+// Render registration template
 app.get("/register", (req, res) => {
   const templateVars = {
     user: users[req.session.user_id]
@@ -120,13 +136,13 @@ app.get("/register", (req, res) => {
 app.get("/login", (req, res) => {
   const templateVars = {
     user: users[req.session.userID]
-  }
+  };
   if (templateVars.user) {
-    return res.redirect("/urls")
+    return res.redirect("/urls");
   }
 
-  return res.render("urls_login", templateVars)
-})
+  return res.render("urls_login", templateVars);
+});
 
 // ------------ POST REQUESTS --------------- //
 
@@ -135,7 +151,7 @@ app.post("/urls", (req, res) => {
   const userID = req.session.user_id;
 
   if (!userID) {
-    return res.send("Please login to shorten a URL")
+    return res.send("Please log in to shorten a TinyApp URL.");
   }
 
   const shortURL = generateRandomString();
@@ -149,46 +165,62 @@ app.post("/urls", (req, res) => {
 
 // Registration endpoint that handles the registration data
 app.post("/register", (req, res) => {
-  const userID = generateRandomString()
-  const email = req.body.email;
-  const password = req.body.password;
+  const userID = generateRandomString();
+  const { email, password } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   if (email === "" || password === "") {
-    return res.status(400).send('400. Please enter a valid email address and password');
+    const templateVars = {
+      user: null,
+      error: "Please enter a valid email address and password."
+    }
+    return res.status(400).render("errors", templateVars);
   }
-  else if (getUserByEmail(email, users)) {
-    return res.status(404).send('400. Email associated with existing account')
+  if (getUserByEmail(email, users)) {
+    const templateVars = {
+      user: null,
+      error: "Email associated with existing account."
+    }
+    return res.status(400).render("errors", templateVars);
   }
-  else {
-    users[userID] = {
-      userID,
-      email,
-      password: hashedPassword
-    };
+  users[userID] = {
+    userID,
+    email,
+    password: hashedPassword
+  };
 
-    res.session.user_id = userID;
-    return res.redirect("/urls");
-  }
+  req.session.user_id = userID;
+  return res.redirect("/urls");
 });
 
 // Login Endpoint
 app.post("/login", (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
+  const { email, password } = req.body;
 
   if (email === '' || password === '') {
-    return res.status(400).send('400. Email and password is required.');
+    const templateVars = {
+      user: null,
+      error: "Please enter a valid email address and password."
+    }
+    return res.status(400).render("errors", templateVars);
   }
 
-  const user = getUserByEmail(email, users)
+  const user = getUserByEmail(email, users);
 
   if (!user) {
-    return res.status(404).send("404. User not found.")
+    const templateVars = {
+      user: null,
+      error: "User not found. Please register to get started."
+    }
+    return res.status(403).render("errors", templateVars);
   }
 
   if (!bcrypt.compareSync(password, user.password)) {
-    return res.status(403).send("Incorrect email or password. Please try again.")
+    const templateVars = {
+      user: null,
+      error: "Incorrect email or password. Please try again."
+    }
+    return res.status(403).render("errors", templateVars);
   }
 
   req.session.user_id = user.userID;
@@ -203,58 +235,52 @@ app.post("/logout", (req, res) => {
 });
 
 
-// ------------ PUT & DELETE REQUESTS ------------- //
+// ------------ DELETE & PUT REQUESTS ------------- //
 
 // Delete a URL
 app.delete("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   const userID = req.session.user_id;
-  const userURLS = urlsForUser(userID, urlDatabase)
+  const userURLS = urlsForUser(userID, urlDatabase);
 
-  // if user is not logged in
   if (!userID) {
-    return res.status(403).send("Must be logged in or registered to access URLs.")
+    return res.status(403).send("Must be logged in or registered to access URLs.");
   }
 
-  // if shortURL does not exist in the database
   if (!urlDatabase[id]) {
-    return res.status(404).send("URL does not exist")
+    return res.status(404).send("URL does not exist");
   }
 
-  //if url does not belong to user
   if (!userURLS[id]) {
-    return res.status(403).send("You do not have access")
+    return res.status(403).send("You do not have access");
   }
 
   delete urlDatabase[id];
-  res.redirect("/urls")
+  res.redirect("/urls");
 });
 
 // Edit/update a URL
 app.put("/urls/:id", (req, res) => {
-  const id = req.params.id
+  const id = req.params.id;
   const userID = req.session.user_id;
   let newURL = req.body.updatedURL;
 
-  // if user not logged in
   if (!userID) {
-    return res.status(403).send("Must be logged in or registered to access URLs")
+    return res.status(403).send("Must be logged in or registered to access URLs");
   }
 
-  // if shortURL does not exist in the datas base 
   if (!urlDatabase[id]) {
-    return res.status(404).send("URL does not exist")
+    return res.status(404).send("URL does not exist");
   }
 
-  // if URL does not belong to the user
-  const userURLS = urlsForUser(userID, urlDatabase)
+  const userURLS = urlsForUser(userID, urlDatabase);
   if (!userURLS[id]) {
-    return res.status(403).send("You do not have acess to this url")
+    return res.status(403).send("You do not have acess to this url");
   }
 
   if (!newURL.includes('http')) {
-    newURL = `http://${newURL}`
-  };
+    newURL = `http://${newURL}`;
+  }
   urlDatabase[id].longURL = newURL;
   res.redirect("/urls");
 });

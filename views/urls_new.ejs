@@ -15,7 +15,7 @@
       crossorigin="anonymous"
     />
 
-    <title>New URL - TinyApp Example</title>
+    <title>TinyApp - New URL</title>
   </head>
 
   <body>
@@ -25,20 +25,26 @@
       <h3>Create TinyURL</h3>
       <form class="form-inline" action="/urls" method="POST">
         <div class="form-group mb-2">
-          <label for="longURL">Enter a URL:</label>
+          <label for="longURL"><strong>Enter a URL:</strong></label>
           <input
             class="form-control"
+            required
             type="text"
             name="longURL"
             placeholder="http://"
-            style="width: 300px; margin: 1em"
+            style="width: 450px; margin: 1em"
           />
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="background-color: darkblue; color: white"
+          >
+            Submit
+          </button>
         </div>
       </form>
     </main>
 
-    
     <!-- Bootstrap JS -->
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

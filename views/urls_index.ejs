@@ -14,13 +14,12 @@
       integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
       crossorigin="anonymous"
     />
-    <title>TinyApp</title>
+    <title>TinyApp - My URLs</title>
   </head>
   <body>
     <%- include('partials/_header') %>
     <main style="margin: 1em">
       <h3>My URLs</h3>
-
       <table class="table">
         <thead>
           <tr>
@@ -37,7 +36,13 @@
             <td><%= urls[id] %></td>
             <td>
               <form method="get" action="/urls/<%= id %>">
-                <button type="submit">Edit</button>
+                <button
+                  type="submit"
+                  style="background-color: blue; color: white; outline: auto"
+                  class="btn btn-primary"
+                >
+                  Edit
+                </button>
               </form>
             </td>
             <td>
@@ -45,7 +50,13 @@
                 method="post"
                 action="/urls/<%= id %>/delete?_method=DELETE"
               >
-                <button type="submit">Delete</button>
+                <button
+                  type="submit"
+                  style="background-color: red; color: white; outline: auto"
+                  class="btn btn-primary"
+                >
+                  Delete
+                </button>
               </form>
             </td>
           </tr>

@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>TinyApp</title>
+    <title>TinyApp - Login</title>
     <meta charset="utf-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
+
     <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
@@ -16,15 +17,18 @@
     />
     <title>Login</title>
   </head>
-  <body>
+  <body> 
     <%- include('partials/_header') %>
     <main style="margin: 2em">
+      <h3>Welcome back!</h3>
       <form method="post" action="/login">
-        <label for="email">Email</label>
-        <input type="email" name="email" placeholder="Enter email" />
-        <label for="password">Password</label>
-        <input type="password" name="password" placeholder="Password" />
-        <button type="submit">Login</button>
+        <div class="form-group">
+          <label for = "email">Email</label>
+          <input type="email" name="email" placeholder="Enter email" class="form-control" style = "width: 500px;" required/></p>
+          <label for="password">Password</label>
+          <input type="password" name="password" placeholder="Password" class="form-control" style = "width: 500px" required/></p>
+          <button type="submit" style="background-color: darkblue; color: white" class="btn btn-primary">Login</button>
+        <div>
       </form>
     </main>
 

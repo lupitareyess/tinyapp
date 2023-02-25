@@ -1,6 +1,9 @@
 <header>
-  <nav class="navbar navbar-expand-md navbar-dark bg-success">
-    <a class="navbar-brand" href="/urls">TinyApp</a>
+  <nav
+    class="navbar navbar-expand-md navbar navbar-light"
+    style="background-color: darkblue"
+  >
+    <a class="navbar-brand" href="/urls" style="color: white">TinyApp</a>
     <button
       class="navbar-toggler"
       type="button"
@@ -12,23 +15,36 @@
     >
       <span class="navbar-toggler-icon"></span>
     </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a href="/urls" class="nav-item nav-link" style="color: white"
+          >My URLs</a
+        >
+        <a href="/urls/new" class="nav-item nav-link" style="color: white"
+          >Create New URL</a
+        >
+      </div>
+    </div>
+    <% if (!user) { %>
     <div class="navbar-nav">
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+      <a href="/login" class="nav-item nav-link" style="color: white">Login</a>
+      <a href="/register" class="nav-item nav-link" style="color: white"
+        >Register</a
+      >
+    </div>
+    <% } else { %>
+    <form method="post" action="/logout" class="form-inline">
+      <div style="color: white">
+        Hello, <%= user.email %>
+        <button
+          type="submit"
+          style="background-color: white; color: black; outline: darkblue"
+          class="btn btn-primary"
+        >
+          Logout
+        </button>
       </div>
-      <% if (!user) { %>
-        <div class = "navbar-nav">
-        <a href="/login" class="nav-item nav-link">Login</a>
-        <a href="/register" class="nav-item nav-link">Register</a>
-      </div>
-      <% } else { %>
-        <form class="form-inline" action="/logout" method="post">
-          <div>
-            Logged in as: <%= user.email %>
-            <button type="submit">Logout</button>
-          </div>
-        </form>
-      <% } %>
+    </form>
+    <%} %>
   </nav>
 </header>

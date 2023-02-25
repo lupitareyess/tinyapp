@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require("bcryptjs");
 const cookieSession = require("cookie-session");
 const { generateRandomString, getUserByEmail, urlsForUser } = require("./helpers");
+const methodOverride = require("method-override");
 
 app.set("view engine", "ejs");
 
@@ -15,6 +16,7 @@ app.use(cookieSession({
   name: "session",
   keys: ["key1"]
 }));
+app.use(methodOverride("_method"));
 
 // New URL database - longURL now nested in object
 const urlDatabase = {
@@ -136,7 +138,7 @@ app.get("/urls/:id", (req, res) => {
 });
 
 // Delete a URL
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   const userID = req.session.user_id;
   const userURLS = urlsForUser(userID, urlDatabase)
@@ -161,11 +163,10 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 // Edit/update a URL
-app.post("/urls/:id", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   const id = req.params.id
-  let newURL = req.body.updatedURL;
   const userID = req.session.user_id;
-  const userURLS = urlsForUser(userID, urlDatabase)
+  let newURL = req.body.updatedURL;
 
   // if user not logged in
   if (!userID) {
@@ -178,6 +179,7 @@ app.post("/urls/:id", (req, res) => {
   }
 
   // if URL does not belong to the user
+  const userURLS = urlsForUser(userID, urlDatabase)
   if (!userURLS[id]) {
     return res.status(403).send("You do not have acess to this url")
   }
@@ -185,7 +187,7 @@ app.post("/urls/:id", (req, res) => {
   if (!newURL.includes('http')) {
     newURL = `http://${newURL}`
   };
-  urlDatabase[id] = newURL;
+  urlDatabase[id].longURL = newURL;
   res.redirect("/urls");
 });
 

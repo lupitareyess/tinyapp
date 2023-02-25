@@ -41,7 +41,10 @@
               </form>
             </td>
             <td>
-              <form method="post" action="/urls/<%= id %>/delete">
+              <form
+                method="post"
+                action="/urls/<%= id %>/delete?_method=DELETE"
+              >
                 <button type="submit">Delete</button>
               </form>
             </td>

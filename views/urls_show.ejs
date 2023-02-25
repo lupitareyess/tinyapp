@@ -24,7 +24,7 @@
       <div class="card-footer text-muted">
         <label
           >Edit
-          <form method="post" action="/urls/<%= id %>">
+          <form method="post" action="/urls/<%= id %>?_method=PUT">
             <label>New URL:</label>
             <input name="updatedURL" type="text" value="http://" required />
             <button type="submit">Submit</button>

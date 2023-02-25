@@ -101,7 +101,7 @@ app.get("/urls/:id", (req, res) => {
     error: ''
   };
 
-  res.render("urls_show", templateVars);
+  return res.render("urls_show", templateVars);
 });
 
 // Redirection from shortURL to the appropriate longURL
@@ -256,7 +256,7 @@ app.delete("/urls/:id/delete", (req, res) => {
   }
 
   delete urlDatabase[id];
-  res.redirect("/urls");
+  return res.redirect("/urls");
 });
 
 // Edit/update a URL
@@ -282,7 +282,7 @@ app.put("/urls/:id", (req, res) => {
     newURL = `http://${newURL}`;
   }
   urlDatabase[id].longURL = newURL;
-  res.redirect("/urls");
+  return res.redirect("/urls");
 });
 
 // ---------- LISTENING PORT ------------ //

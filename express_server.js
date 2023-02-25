@@ -4,6 +4,7 @@ const PORT = 8080;
 const cookieParser = require('cookie-parser');
 const bcrypt = require("bcryptjs");
 const cookieSession = require("cookie-session");
+const { generateRandomString, getUserByEmail, urlsForUser } = require("./helpers");
 
 app.set("view engine", "ejs");
 
@@ -41,40 +42,6 @@ const users = {
   },
 };
 
-// Generate unique short URL id whoch returns 6 random alphanumeric characters
-const generateRandomString = () => {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const length = 6;
-  let randomString = "";
-  let randomNumber;
-
-  for (let i = 0; i < length; i++) {
-    randomNumber = Math.floor(Math.random() * characters.length);
-    randomString += characters[randomNumber];
-  }
-  return randomString;
-};
-
-// Function to lookup user
-const getUserByEmail = (email) => {
-  for (const user in users) {
-    if (email === users[user].email) {
-      return users[user];
-    }
-  }
-  return null;
-}
-
-// Function to associate each new URL with the user that created it
-const urlsForUser = (userID) => {
-  let userUrls = {};
-  for (const id in urlDatabase) {
-    if (userID === urlDatabase[id].userID) {
-      userUrls[id] = urlDatabase[id].longURL;
-    }
-  }
-  return userUrls;
-};
 
 //Change this later, will be for homepage
 app.get("/", (req, res) => {
@@ -83,12 +50,12 @@ app.get("/", (req, res) => {
 
 // Pass URL data to urls_index template
 app.get("/urls", (req, res) => {
-  const cookie = req.session.user_id;
+  const userID = req.session.user_id;
   const templateVars = {
-    urls: urlsForUser(cookie),
-    user: users[cookie]
+    urls: urlsForUser(userID, urlDatabase),
+    user: users[userID]
   }
-  console.log(cookie);
+  console.log(userID);
   console.log(templateVars);
 
   if (!templateVars.user) {
@@ -99,9 +66,9 @@ app.get("/urls", (req, res) => {
 
 // Render form on web page to present to user 
 app.get("/urls/new", (req, res) => {
-  const cookie = req.session.user_id;
+  const userID = req.session.user_id;
   const templateVars = {
-    user: users[cookie]
+    user: users[userID]
   }
   if (!templateVars.user) {
     return res.redirect("/login")
@@ -111,9 +78,9 @@ app.get("/urls/new", (req, res) => {
 
 // Handle the form submission
 app.post("/urls", (req, res) => {
-  const cookie = req.session.user_id;
+  const userID = req.session.user_id;
 
-  if (!cookie) {
+  if (!userID) {
     return res.send("Please login to shorten a URL")
   }
   const shortURL = generateRandomString();
@@ -141,11 +108,11 @@ app.get("/u/:id", (req, res) => {
 // Page that displays a single URL and its shortened form
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
-  const cookie = req.session.user_id;
-  const userURLS = urlsForUser(cookie);
+  const userID = req.session.user_id;
+  const userURLS = urlsForUser(userID, urlDatabase);
 
   //if user is not logged in
-  if (!cookie) {
+  if (!userID) {
     return res.status(403).send("Must be logged in or registered to acess URLs")
   }
 
@@ -163,7 +130,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: id,
     longURL: urlDatabase[id].longURL,
-    user: users[cookie]
+    user: users[userID]
   }
   res.render("urls_show", templateVars);
 });
@@ -171,11 +138,11 @@ app.get("/urls/:id", (req, res) => {
 // Delete a URL
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
-  const cookie = req.session.user_id;
-  const userURLS = urlsForUser(cookie)
+  const userID = req.session.user_id;
+  const userURLS = urlsForUser(userID, urlDatabase)
 
   // if user is not logged in
-  if (!cookie) {
+  if (!userID) {
     return res.status(403).send("Must be logged in or registered to access URLs.")
   }
 
@@ -197,11 +164,11 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id
   let newURL = req.body.updatedURL;
-  const cookie = req.session.user_id;
-  const userURLS = urlsForUser(cookie)
+  const userID = req.session.user_id;
+  const userURLS = urlsForUser(userID, urlDatabase)
 
   // if user not logged in
-  if (!cookie) {
+  if (!userID) {
     return res.status(403).send("Must be logged in or registered to access URLs")
   }
 
@@ -225,7 +192,7 @@ app.post("/urls/:id", (req, res) => {
 // Login route - render login template
 app.get("/login", (req, res) => {
   const templateVars = {
-    user: users[req.cookies["user_id"]]
+    user: users[req.session.userID]
   }
   if (templateVars.user) {
     return res.redirect("/urls")
@@ -243,7 +210,7 @@ app.post("/login", (req, res) => {
     return res.status(400).send('400. Email and password is required.');
   }
 
-  const user = getUserByEmail(email)
+  const user = getUserByEmail(email, users)
   console.log("user", user)
   if (!user) {
     return res.status(404).send("404. User not found.")
@@ -286,7 +253,7 @@ app.post("/register", (req, res) => {
   if (email === "" || password === "") {
     return res.status(404).send('400. Request has resulted in an error');
   }
-  else if (getUserByEmail(email)) {
+  else if (getUserByEmail(email, users)) {
     return res.status(404).send('400. Email associated with existing account')
   }
   else {

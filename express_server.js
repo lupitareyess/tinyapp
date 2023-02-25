@@ -18,31 +18,8 @@ app.use(cookieSession({
 }));
 app.use(methodOverride("_method"));
 
-// New URL database - longURL now nested in object
-const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "aJ48lW",
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "aJ48lW",
-  },
-};
 
-// User database
-const users = {
-  userRandomID: {
-    userID: "userRandomID",
-    email: "user@example.com",
-    password: bcrypt.hashSync("hello", 10)
-  },
-  user2RandomID: {
-    userID: "user2RandomID",
-    email: "user2@example.com",
-    password: bcrypt.hashSync("bye", 10)
-  },
-};
+const { urlDatabase, users } = require("./data");
 
 
 //Change this later, will be for homepage
